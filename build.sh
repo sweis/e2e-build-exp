@@ -52,6 +52,25 @@ e2e_assert_dependencies() {
   echo "All dependencies met."
 }
 
+e2e_build_library() {
+  e2e_assert_dependencies
+  set -e
+  BUILD_EXT_DIR="$BUILD_DIR/library"
+  mkdir -p "$BUILD_EXT_DIR"
+  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript \
+    lib/zlib.js/src lib/typedarray )
+  # See https://developers.google.com/closure/library/docs/closurebuilder
+  JSCOMPILE_CMD="$PYTHON_CMD lib/closure-library/closure/bin/build/closurebuilder.py -c lib/closure-compiler/compiler.jar"
+  jscompile_e2e="$JSCOMPILE_CMD"
+  for var in "${SRC_DIRS[@]}"
+  do
+    jscompile_e2e+=" --root $var"
+  done
+  $jscompile_e2e -o compiled -n "e2e.openpgp.ContextImpl" > "$BUILD_EXT_DIR/end-to-end.compiled.js"
+  $jscompile_e2e -o script -n "e2e.openpgp.ContextImpl"  -f --debug \
+      -f --formatting=PRETTY_PRINT > "$BUILD_EXT_DIR/end-to-end.debug.js"
+}
+
 e2e_build_extension() {
   e2e_assert_dependencies
   set -e
@@ -116,6 +135,9 @@ case "$1" in
     ;;
   extension)
     e2e_build_extension;
+    ;;
+  library)
+    e2e_build_library;
     ;;
   clean)
     e2e_build_clean;
