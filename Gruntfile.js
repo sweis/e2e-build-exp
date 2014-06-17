@@ -17,126 +17,38 @@
  * @author koto@google.com (Krzysztof Kotowicz)
  */
 module.exports = function(grunt) {
-
-  var CLOSURE_SRC_DIRS = [
-          'src',
-          'lib/closure-library',
-          'lib/closure-templates/javascript',
-          'lib/zlib.js/src',
-          'lib/typedarray'
-  ];
-
-  var BUILD_EXT_DIR = 'build/extension';
-
   grunt.initConfig({
-    closureBuilder:  {
-      options: {
-        closureLibraryPath: 'lib/closure-library', // path to closure library
-        compilerFile: 'lib/closure-compiler/compiler.jar',
-        compile: true,
-        compilerOpts: {
-        },
-        execOpts: {
-           maxBuffer: 999999 * 1024
-        }
-      },
-      extension_launcher: {
-        src: CLOSURE_SRC_DIRS,
-        dest: BUILD_EXT_DIR + '/launcher_binary.js',
-        options: {
-          inputs: 'src/javascript/crypto/e2e/extension/bootstrap.js'
-        }
-      },
-      extension_helper: {
-        src: CLOSURE_SRC_DIRS,
-        dest: BUILD_EXT_DIR + '/helper_binary.js',
-        options: {
-          inputs: 'src/javascript/crypto/e2e/extension/helper/helper.js'
-        }
-      },
-      extension_glass: {
-        src: CLOSURE_SRC_DIRS,
-        dest: BUILD_EXT_DIR + '/glass_binary.js',
-        options: {
-          inputs: 'src/javascript/crypto/e2e/extension/ui/glass/bootstrap.js'
-        }
-      },
-      extension_settings: {
-        src: CLOSURE_SRC_DIRS,
-        dest: BUILD_EXT_DIR + '/settings_binary.js',
-        options: {
-          inputs: 'src/javascript/crypto/e2e/extension/ui/settings/settings.js'
-        }
-      },
-      extension_prompt: {
-        src: CLOSURE_SRC_DIRS,
-        dest: BUILD_EXT_DIR + '/prompt_binary.js',
-        options: {
-          inputs: 'src/javascript/crypto/e2e/extension/ui/prompt/prompt.js'
-        }
-      },
-      extension_welcome: {
-        src: CLOSURE_SRC_DIRS,
-        dest: BUILD_EXT_DIR + '/welcome_binary.js',
-        options: {
-          inputs: 'src/javascript/crypto/e2e/extension/ui/welcome/welcome.js'
-        }
-      }
-    },
-    copy: {
-      extension_files: {
-        files: [
-          {
-            expand: true,
-            cwd: 'src/javascript/crypto/e2e/extension',
-            src: [
-              'images/**',
-              '_locales/**',
-            ],
-            dest: BUILD_EXT_DIR
-          },
-          {
-             expand: true,
-             flatten: true,
-             cwd: 'src/javascript/crypto/e2e/extension',
-             src: [
-              'ui/**/*.html',
-              'helper/gmonkeystub.js',
-              'manifest.json',
-             ], dest: BUILD_EXT_DIR,
-          }
-        ]
-      }
-    },
     shell: {
-      cssCompile: {
-        options: {
-          stderr: false
-        },
-        command: function(name) {
-          if (name.match(/^[a-z_]+$/)) {
-            return 'java -jar lib/closure-stylesheets-20111230.jar ' +
-            'src/javascript/crypto/e2e/extension/ui/styles/base.css ' +
-            'src/javascript/crypto/e2e/extension/ui/' + name + '/' + name +
-                '.css ' +
-            '-o ' + BUILD_EXT_DIR + '/' + name + '_styles.css';
+      buildScript: {
+        options: {},
+        command: function(target) {
+          if (target.match(/^[-a-z_]+$/)) {
+            return 'bash ./build.sh ' + target;
           }
         }
       }
     }
   });
 
-  grunt.loadNpmTasks('grunt-closure-tools');
-  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-shell');
 
-  grunt.registerTask('default', [
-    'closureBuilder',
-    'shell:cssCompile:glass',
-    'shell:cssCompile:prompt',
-    'shell:cssCompile:settings',
-    'shell:cssCompile:welcome',
-    'copy:extension_files'
+  grunt.registerTask('build-extension', [
+    'shell:buildScript:extension'
   ]);
 
+  grunt.registerTask('check-deps', [
+    'shell:buildScript:check_deps'
+  ]);
+
+  grunt.registerTask('install-deps', [
+    'shell:buildScript:install_deps'
+  ]);
+
+  grunt.registerTask('clean', [
+    'shell:buildScript:clean'
+  ]);
+
+  grunt.registerTask('default', [
+    'build-extension'
+  ]);
 };
