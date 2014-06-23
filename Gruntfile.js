@@ -57,6 +57,10 @@ module.exports = function(grunt) {
     'shell:doScript:update'
   ]);
 
+  grunt.registerTask('testserver', [
+    'shell:doScript:testserver'
+  ]);
+
   grunt.registerTask('default', [
     'build-extension'
   ]);

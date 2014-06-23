@@ -61,6 +61,11 @@ Building the library only:
   $ ls build/library/
   end-to-end.compiled.js  end-to-end.debug.js
 
+Starting the test server:
+  $ ./do.sh testserver
+  Starting the End-To-End test server (Press Ctrl-C to stop)...
+  Starting test server at http://127.0.0.1:8000
+
 Updating to newest sources:
   $ ./build.sh update_src
 

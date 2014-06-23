@@ -127,6 +127,12 @@ e2e_install_deps() {
   echo "Done."
 }
 
+e2e_testserver() {
+  echo "Starting the End-To-End test server (Press Ctrl-C to stop)..."
+  $PYTHON_CMD test_server.py
+  echo "Done."
+}
+
 e2e_update() {
   echo "Updating End-To-End sources from upstream..."
   if [ ! -d src/.git ]; then
@@ -159,8 +165,11 @@ case "$1" in
   clean)
     e2e_build_clean;
     ;;
+  testserver)
+    e2e_testserver;
+    ;;
   *)
-    echo "Usage: $0 {build_extension|build_library|clean|check_deps|install_deps|update}"
+    echo "Usage: $0 {build_extension|build_library|clean|check_deps|install_deps|update|testserver}"
     RETVAL=1
 esac
 
