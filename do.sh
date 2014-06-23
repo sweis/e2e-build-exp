@@ -121,13 +121,15 @@ e2e_build_clean() {
 e2e_install_deps() {
   echo "Installing build dependencies..."
   ./download-libs.sh
-  git clone "$SRC_REPO_URL" src/
+  if [ ! -d src/.git ]; then
+    git clone "$SRC_REPO_URL" src/
+  fi
   echo "Done."
 }
 
 e2e_update() {
   echo "Updating End-To-End sources from upstream..."
-  if [ ! -f src/javascript ]; then
+  if [ ! -d src/.git ]; then
     git clone "$SRC_REPO_URL" src/
   fi
   cd src

@@ -21,22 +21,32 @@
 cd lib
 
 # checkout closure library
-git clone https://github.com/google/closure-library/ closure-library
+if [ ! -d closure-library/.git ]; then
+  git clone https://github.com/google/closure-library/ closure-library
+fi
 
 # checkout closure templates
-svn checkout https://closure-templates.googlecode.com/svn/trunk/ closure-templates
+if [ ! -d closure-templates/.svn ]; then
+  svn checkout https://closure-templates.googlecode.com/svn/trunk/ closure-templates
+fi
 
 # checkout zlib.js
-git clone https://github.com/imaya/zlib.js zlib.js
-mkdir typedarray
-ln -s ../zlib.js/define/typedarray/use.js typedarray/use.js
+if [ ! -d zlib.js/.git ]; then
+  git clone https://github.com/imaya/zlib.js zlib.js
+  mkdir typedarray
+  ln -s ../zlib.js/define/typedarray/use.js typedarray/use.js
+fi
 
 # checkout js compiler
-curl https://dl.google.com/closure-compiler/compiler-latest.zip -O # -k --ssl-added-and-removed-here-;-)
-unzip compiler-latest.zip -d closure-compiler
-rm compiler-latest.zip
+if [ ! -d closure-compiler ]; then
+  curl https://dl.google.com/closure-compiler/compiler-latest.zip -O # -k --ssl-added-and-removed-here-;-)
+  unzip compiler-latest.zip -d closure-compiler
+  rm compiler-latest.zip
+fi
 
 # checkout css compiler
-curl https://closure-stylesheets.googlecode.com/files/closure-stylesheets-20111230.jar -O
+if [ ! -f closure-stylesheets-20111230.jar ]; then
+  curl https://closure-stylesheets.googlecode.com/files/closure-stylesheets-20111230.jar -O
+fi
 
 cd ..
