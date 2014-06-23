@@ -13,7 +13,7 @@
 # // See the License for the specific language governing permissions and
 # // limitations under the License.
 # /**
-#  * @fileoverview Shell script to download End-To-End build dependencies
+#  * @fileoverview Shell script to facilitate build-related tasks for End-To-End 
 #  *
 #  * @author koto@google.com (Krzysztof Kotowicz)
 #  */
@@ -133,17 +133,17 @@ case "$1" in
   install_deps)
     e2e_install_deps;
     ;;
-  extension)
+  build_extension)
     e2e_build_extension;
     ;;
-  library)
+  build_library)
     e2e_build_library;
     ;;
   clean)
     e2e_build_clean;
     ;;
   *)
-    echo "Usage: $0 {extension|clean|check_deps|install_deps}"
+    echo "Usage: $0 {build_extension|build_library|clean|check_deps|install_deps}"
     RETVAL=1
 esac
 

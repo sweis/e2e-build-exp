@@ -19,11 +19,11 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     shell: {
-      buildScript: {
+      doScript: {
         options: {},
         command: function(target) {
           if (target.match(/^[-a-z_]+$/)) {
-            return 'bash ./build.sh ' + target;
+            return 'bash ./do.sh ' + target;
           }
         }
       }
@@ -33,19 +33,24 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
 
   grunt.registerTask('build-extension', [
-    'shell:buildScript:extension'
+    'shell:doScript:build_extension'
   ]);
 
+  grunt.registerTask('build-library', [
+    'shell:doScript:build_library'
+  ]);
+
+
   grunt.registerTask('check-deps', [
-    'shell:buildScript:check_deps'
+    'shell:doScript:check_deps'
   ]);
 
   grunt.registerTask('install-deps', [
-    'shell:buildScript:install_deps'
+    'shell:doScript:install_deps'
   ]);
 
   grunt.registerTask('clean', [
-    'shell:buildScript:clean'
+    'shell:doScript:clean'
   ]);
 
   grunt.registerTask('default', [
