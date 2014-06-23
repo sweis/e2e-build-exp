@@ -87,8 +87,7 @@ e2e_build_extension() {
   do
     jscompile_e2e+=" --root $var"
   done
-  csscompile_e2e="java -jar lib/closure-stylesheets-20111230.jar \
-    src/javascript/crypto/e2e/extension/ui/styles/base.css"
+  csscompile_e2e="java -jar lib/closure-stylesheets-20111230.jar \    src/javascript/crypto/e2e/extension/ui/styles/base.css"
   # compile javascript files
   echo "Compiling JS files..."
   $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/bootstrap.js" > "$BUILD_EXT_DIR/launcher_binary.js"
@@ -128,6 +127,9 @@ e2e_install_deps() {
 
 e2e_update() {
   echo "Updating End-To-End sources from upstream..."
+  if [ ! -f src/javascript ]; then
+    git clone "$SRC_REPO_URL" src/
+  fi
   cd src
   git pull origin master
   cd ..
