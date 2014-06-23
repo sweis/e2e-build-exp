@@ -53,6 +53,10 @@ module.exports = function(grunt) {
     'shell:doScript:clean'
   ]);
 
+  grunt.registerTask('update', [
+    'shell:doScript:update'
+  ]);
+
   grunt.registerTask('default', [
     'build-extension'
   ]);

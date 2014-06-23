@@ -19,7 +19,7 @@
 #  */
 
 PYTHON_CMD="python"
-JSCOMPILE_CMD="$PYTHON_CMD lib/closure-library/closure/bin/build/closurebuilder.py -o compiled -c lib/closure-compiler/compiler.jar"
+JSCOMPILE_CMD="$PYTHON_CMD lib/closure-library/closure/bin/build/closurebuilder.py -c lib/closure-compiler/compiler.jar"
 BUILD_DIR="build"
 
 cd ${0%/*}
@@ -56,11 +56,11 @@ e2e_build_library() {
   e2e_assert_dependencies
   set -e
   BUILD_EXT_DIR="$BUILD_DIR/library"
+  echo "Building End-To-End library into $BUILD_EXT_DIR ..."
   mkdir -p "$BUILD_EXT_DIR"
   SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript \
     lib/zlib.js/src lib/typedarray )
   # See https://developers.google.com/closure/library/docs/closurebuilder
-  JSCOMPILE_CMD="$PYTHON_CMD lib/closure-library/closure/bin/build/closurebuilder.py -c lib/closure-compiler/compiler.jar"
   jscompile_e2e="$JSCOMPILE_CMD"
   for var in "${SRC_DIRS[@]}"
   do
@@ -69,6 +69,7 @@ e2e_build_library() {
   $jscompile_e2e -o compiled -n "e2e.openpgp.ContextImpl" > "$BUILD_EXT_DIR/end-to-end.compiled.js"
   $jscompile_e2e -o script -n "e2e.openpgp.ContextImpl"  -f --debug \
       -f --formatting=PRETTY_PRINT > "$BUILD_EXT_DIR/end-to-end.debug.js"
+  echo "Done."
 }
 
 e2e_build_extension() {
@@ -90,12 +91,12 @@ e2e_build_extension() {
     src/javascript/crypto/e2e/extension/ui/styles/base.css"
   # compile javascript files
   echo "Compiling JS files..."
-  $jscompile_e2e -i "$SRC_EXT_DIR/bootstrap.js" > "$BUILD_EXT_DIR/launcher_binary.js"
-  $jscompile_e2e -i "$SRC_EXT_DIR/helper/helper.js" > "$BUILD_EXT_DIR/helper_binary.js"
-  $jscompile_e2e -i "$SRC_EXT_DIR/ui/glass/bootstrap.js" > "$BUILD_EXT_DIR/glass_binary.js"
-  $jscompile_e2e -i "$SRC_EXT_DIR/ui/prompt/prompt.js" > "$BUILD_EXT_DIR/prompt_binary.js"
-  $jscompile_e2e -i "$SRC_EXT_DIR/ui/settings/settings.js" > "$BUILD_EXT_DIR/settings_binary.js"
-  $jscompile_e2e -i "$SRC_EXT_DIR/ui/welcome/welcome.js" > "$BUILD_EXT_DIR/welcome_binary.js"
+  $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/bootstrap.js" > "$BUILD_EXT_DIR/launcher_binary.js"
+  $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/helper/helper.js" > "$BUILD_EXT_DIR/helper_binary.js"
+  $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/ui/glass/bootstrap.js" > "$BUILD_EXT_DIR/glass_binary.js"
+  $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/ui/prompt/prompt.js" > "$BUILD_EXT_DIR/prompt_binary.js"
+  $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/ui/settings/settings.js" > "$BUILD_EXT_DIR/settings_binary.js"
+  $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/ui/welcome/welcome.js" > "$BUILD_EXT_DIR/welcome_binary.js"
   # compile css files
   echo "Compiling CSS files..."
   $csscompile_e2e "$SRC_EXT_DIR/ui/glass/glass.css" > "$BUILD_EXT_DIR/glass_styles.css"
@@ -124,6 +125,13 @@ e2e_install_deps() {
   echo "Done."
 }
 
+e2e_update() {
+  echo "Updating End-To-End sources from upstream..."
+  cd src
+  git pull origin master
+  cd ..
+  echo "Done."
+}
 RETVAL=0
 
 case "$1" in
@@ -132,6 +140,10 @@ case "$1" in
     ;;
   install_deps)
     e2e_install_deps;
+    e2e_update;
+    ;;
+  update)
+    e2e_update;
     ;;
   build_extension)
     e2e_build_extension;
@@ -143,7 +155,7 @@ case "$1" in
     e2e_build_clean;
     ;;
   *)
-    echo "Usage: $0 {build_extension|build_library|clean|check_deps|install_deps}"
+    echo "Usage: $0 {build_extension|build_library|clean|check_deps|install_deps|update}"
     RETVAL=1
 esac
 
