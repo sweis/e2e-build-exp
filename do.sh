@@ -13,7 +13,7 @@
 # // See the License for the specific language governing permissions and
 # // limitations under the License.
 # /**
-#  * @fileoverview Shell script to facilitate build-related tasks for End-To-End 
+#  * @fileoverview Shell script to facilitate build-related tasks for End-To-End
 #  *
 #  * @author koto@google.com (Krzysztof Kotowicz)
 #  */
@@ -87,7 +87,7 @@ e2e_build_extension() {
   do
     jscompile_e2e+=" --root $var"
   done
-  csscompile_e2e="java -jar lib/closure-stylesheets-20111230.jar \    src/javascript/crypto/e2e/extension/ui/styles/base.css"
+  csscompile_e2e="java -jar lib/closure-stylesheets-20111230.jar src/javascript/crypto/e2e/extension/ui/styles/base.css"
   # compile javascript files
   echo "Compiling JS files..."
   $jscompile_e2e -o compiled -i "$SRC_EXT_DIR/bootstrap.js" > "$BUILD_EXT_DIR/launcher_binary.js"
