@@ -1,6 +1,5 @@
 {
   "name": "end-to-end",
-  "version": "0.3.1337",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-shell": "^0.7.0"
