@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # // Copyright 2014 Google Inc. All rights reserved.
 # //
 # // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 #  *
 #  * @author koto@google.com (Krzysztof Kotowicz)
 #  */
-
 PYTHON_CMD="python"
 JSCOMPILE_CMD="$PYTHON_CMD lib/closure-library/closure/bin/build/closurebuilder.py -c lib/closure-compiler/compiler.jar"
 BUILD_DIR="build"
@@ -37,7 +36,7 @@ e2e_assert_dependencies() {
   for var in "${files[@]}"
   do
     if [ ! -e $var ]; then
-      echo >&2 "Download libraries needed to build first. Use download-libs.sh"
+      echo >&2 "Download libraries needed to build first. Use $0 install_deps."
       exit 1
     fi
   done
