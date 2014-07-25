@@ -44,6 +44,13 @@ if [ ! -d closure-compiler ]; then
   rm compiler-latest.zip
 fi
 
+# checkout closure templates compiler
+if [ ! -d closure-templates-compiler ]; then
+  curl http://closure-templates.googlecode.com/files/closure-templates-for-javascript-latest.zip -O # -k --ssl-added-and-removed-here-;-)
+  unzip closure-templates-for-javascript-latest.zip -d closure-templates-compiler
+  rm closure-templates-for-javascript-latest.zip
+fi
+
 # checkout css compiler
 if [ ! -f closure-stylesheets-20111230.jar ]; then
   curl https://closure-stylesheets.googlecode.com/files/closure-stylesheets-20111230.jar -O

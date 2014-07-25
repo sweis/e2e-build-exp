@@ -75,11 +75,19 @@ e2e_build_extension() {
   e2e_assert_dependencies
   set -e
   BUILD_EXT_DIR="$BUILD_DIR/extension"
+  TMP_DIR="$BUILD_DIR/soy-tmp"
   mkdir -p "$BUILD_EXT_DIR"
+  mkdir -p "$TMP_DIR"
   echo "Building End-To-End extension to $BUILD_EXT_DIR"
   SRC_EXT_DIR="src/javascript/crypto/e2e/extension"
-  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript \
+  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript $TMP_DIR \
     lib/zlib.js/src lib/typedarray )
+  # Compile soy templates
+  echo "Compiling Soy templates..."
+  find src -name '*.soy' -exec java -jar lib/closure-templates-compiler/SoyToJsSrcCompiler.jar \
+  --shouldProvideRequireSoyNamespaces --shouldGenerateJsdoc --shouldDeclareTopLevelNamespaces --isUsingIjData --srcs {} \
+  --outputPathFormat "$TMP_DIR/{INPUT_DIRECTORY}{INPUT_FILE_NAME}.js" \;
+
   # See https://developers.google.com/closure/library/docs/closurebuilder
   jscompile_e2e="$JSCOMPILE_CMD"
   for var in "${SRC_DIRS[@]}"
@@ -108,6 +116,7 @@ e2e_build_extension() {
   find "$SRC_EXT_DIR/ui" -regex .*.html -exec cp -f "{}" "$BUILD_EXT_DIR" \;
   cp -f "$SRC_EXT_DIR/helper/gmonkeystub.js" "$BUILD_EXT_DIR"
   cp -f "$SRC_EXT_DIR/manifest.json" "$BUILD_EXT_DIR"
+  rm -rf "$TMP_DIR"
   echo "Done."
 }
 
