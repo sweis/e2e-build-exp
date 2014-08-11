@@ -20,6 +20,7 @@
 PYTHON_CMD="python"
 JSCOMPILE_CMD="$PYTHON_CMD lib/closure-library/closure/bin/build/closurebuilder.py -c lib/closure-compiler/compiler.jar"
 BUILD_DIR="build"
+BUILD_TPL_DIR="$BUILD_DIR/templates"
 SRC_REPO_URL="https://code.google.com/p/end-to-end/"
 cd ${0%/*}
 
@@ -51,22 +52,33 @@ e2e_assert_dependencies() {
   echo "All dependencies met."
 }
 
-e2e_build_library() {
-  e2e_assert_dependencies
-  set -e
-  BUILD_EXT_DIR="$BUILD_DIR/library"
-  TMP_DIR="$BUILD_DIR/soy-tmp"
-  echo "Building End-To-End library into $BUILD_EXT_DIR ..."
-  mkdir -p "$BUILD_EXT_DIR"
-  mkdir -p "$TMP_DIR"
-  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript $TMP_DIR \
-    lib/zlib.js/src lib/typedarray )
+e2e_build_templates() {
+  mkdir -p "$BUILD_TPL_DIR"
+  rm -rf "$BUILD_TPL_DIR/*"
   # Compile soy templates
   echo "Compiling Soy templates..."
   find src -name '*.soy' -exec java -jar lib/closure-templates-compiler/SoyToJsSrcCompiler.jar \
   --shouldProvideRequireSoyNamespaces --shouldGenerateJsdoc --shouldDeclareTopLevelNamespaces --isUsingIjData --srcs {} \
-  --outputPathFormat "$TMP_DIR/{INPUT_DIRECTORY}{INPUT_FILE_NAME}.js" \;
+  --outputPathFormat "$BUILD_TPL_DIR/{INPUT_DIRECTORY}{INPUT_FILE_NAME}.js" \;
+  echo "Done."
+}
 
+e2e_assert_templates() {
+  if [ ! -d $BUILD_TPL_DIR ]; then
+    e2e_build_templates
+  fi
+}
+
+e2e_build_library() {
+  e2e_assert_dependencies
+  set -e
+  e2e_assert_templates
+
+  BUILD_EXT_DIR="$BUILD_DIR/library"
+  echo "Building End-To-End library into $BUILD_EXT_DIR ..."
+  mkdir -p "$BUILD_EXT_DIR"
+  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript $BUILD_TPL_DIR \
+    lib/zlib.js/src lib/typedarray )
   # See https://developers.google.com/closure/library/docs/closurebuilder
   jscompile_e2e="$JSCOMPILE_CMD"
   for var in "${SRC_DIRS[@]}"
@@ -76,26 +88,19 @@ e2e_build_library() {
   $jscompile_e2e -o compiled -n "e2e.openpgp.ContextImpl" > "$BUILD_EXT_DIR/end-to-end.compiled.js"
   $jscompile_e2e -o script -n "e2e.openpgp.ContextImpl"  -f --debug \
       -f --formatting=PRETTY_PRINT > "$BUILD_EXT_DIR/end-to-end.debug.js"
-  rm -rf "$TMP_DIR"
   echo "Done."
 }
 
 e2e_build_extension() {
   e2e_assert_dependencies
   set -e
+  e2e_assert_templates
   BUILD_EXT_DIR="$BUILD_DIR/extension"
-  TMP_DIR="$BUILD_DIR/soy-tmp"
   mkdir -p "$BUILD_EXT_DIR"
-  mkdir -p "$TMP_DIR"
   echo "Building End-To-End extension to $BUILD_EXT_DIR"
   SRC_EXT_DIR="src/javascript/crypto/e2e/extension"
-  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript $TMP_DIR \
+  SRC_DIRS=( src lib/closure-library lib/closure-templates/javascript $BUILD_TPL_DIR \
     lib/zlib.js/src lib/typedarray )
-  # Compile soy templates
-  echo "Compiling Soy templates..."
-  find src -name '*.soy' -exec java -jar lib/closure-templates-compiler/SoyToJsSrcCompiler.jar \
-  --shouldProvideRequireSoyNamespaces --shouldGenerateJsdoc --shouldDeclareTopLevelNamespaces --isUsingIjData --srcs {} \
-  --outputPathFormat "$TMP_DIR/{INPUT_DIRECTORY}{INPUT_FILE_NAME}.js" \;
 
   # See https://developers.google.com/closure/library/docs/closurebuilder
   jscompile_e2e="$JSCOMPILE_CMD"
@@ -125,7 +130,6 @@ e2e_build_extension() {
   find "$SRC_EXT_DIR/ui" -regex .*.html -exec cp -f "{}" "$BUILD_EXT_DIR" \;
   cp -f "$SRC_EXT_DIR/helper/gmonkeystub.js" "$BUILD_EXT_DIR"
   cp -f "$SRC_EXT_DIR/manifest.json" "$BUILD_EXT_DIR"
-  rm -rf "$TMP_DIR"
   echo "Done."
 }
 
@@ -179,6 +183,9 @@ case "$1" in
   build_library)
     e2e_build_library;
     ;;
+  build_templates)
+    e2e_build_templates;
+    ;;
   clean)
     e2e_build_clean;
     ;;
@@ -186,7 +193,7 @@ case "$1" in
     e2e_testserver;
     ;;
   *)
-    echo "Usage: $0 {build_extension|build_library|clean|check_deps|install_deps|update|testserver}"
+    echo "Usage: $0 {build_extension|build_library|build_templates|clean|check_deps|install_deps|update|testserver}"
     RETVAL=1
 esac
 
