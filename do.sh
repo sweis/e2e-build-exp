@@ -149,6 +149,15 @@ e2e_install_deps() {
 }
 
 e2e_testserver() {
+  echo "Generating build/test_js_deps-runfiles.js file..."
+  mkdir -p "$BUILD_DIR"
+  $PYTHON_CMD lib/closure-library/closure/bin/build/depswriter.py \
+    --root_with_prefix="build/templates/ ../../../build/templates/" \
+    --root_with_prefix="src/javascript/crypto/e2e/ ../crypto/e2e/" \
+    --root_with_prefix="lib/closure-templates/javascript/ ../../../../lib/closure-templates/javascript" \
+    --root_with_prefix="lib/zlib.js/ ../../../lib/zlib.js/" \
+    > build/test_js_deps-runfiles.js
+
   echo "Starting the End-To-End test server (Press Ctrl-C to stop)..."
   $PYTHON_CMD test_server.py
   echo "Done."
@@ -164,6 +173,7 @@ e2e_update() {
   cd ..
   echo "Done."
 }
+
 RETVAL=0
 
 case "$1" in

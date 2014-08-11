@@ -40,6 +40,9 @@ module.exports = function(grunt) {
     'shell:doScript:build_library'
   ]);
 
+  grunt.registerTask('build-templates', [
+    'shell:doScript:build_templates'
+  ]);
 
   grunt.registerTask('check-deps', [
     'shell:doScript:check_deps'
