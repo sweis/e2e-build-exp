@@ -53,6 +53,7 @@ e2e_assert_dependencies() {
 }
 
 e2e_build_templates() {
+  e2e_assert_dependencies
   mkdir -p "$BUILD_TPL_DIR"
   rm -rf "$BUILD_TPL_DIR/*"
   # Compile soy templates
