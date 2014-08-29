@@ -22,7 +22,7 @@ cd lib
 
 # checkout closure library
 if [ ! -d closure-library/.git ]; then
-  git clone https://github.com/google/closure-library/ closure-library
+  git clone --depth 1 https://github.com/google/closure-library/ closure-library
 fi
 
 # checkout closure templates
@@ -32,7 +32,7 @@ fi
 
 # checkout zlib.js
 if [ ! -d zlib.js/.git ]; then
-  git clone https://github.com/imaya/zlib.js zlib.js
+  git clone --depth 1 https://github.com/imaya/zlib.js zlib.js
   mkdir typedarray
   ln -s ../zlib.js/define/typedarray/use.js typedarray/use.js
 fi
