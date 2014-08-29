@@ -34,7 +34,7 @@ Usage
 Every task can be run from do.sh Bash script:
 
   $ ./do.sh
-  Usage: ./do.sh {build_extension|build_library|clean|check_deps|install_deps|update}
+  Usage: ./do.sh {build_extension|build_library|build_templates|clean|check_deps|install_deps|update|testserver}
 
 Setup
   $ git clone https://code.google.com/p/end-to-end.build/
@@ -60,6 +60,12 @@ Building the library only:
   [...]
   $ ls build/library/
   end-to-end.compiled.js  end-to-end.debug.js
+
+Building the soy templates:
+  $ ./do.sh build_templates
+  [...]
+  $ ls build/templates/
+  src
 
 Starting the test server:
   $ ./do.sh testserver
