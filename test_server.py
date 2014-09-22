@@ -26,6 +26,7 @@ import StringIO
 server_address = ("127.0.0.1", 8000)
 # ./do.sh testserver generates the file
 DEPS_FILE="build/test_js_deps-runfiles.js"
+ALL_JSTESTS_FILE="build/all_tests.js"
 
 class TestServerRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
   """Request handler for End-To-End test server."""
@@ -36,14 +37,29 @@ class TestServerRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       "/src/third_party/closure/": "lib/closure-library/third_party/closure/",
   }
 
-  def list_directory(self, path):
-    """Lists only src/**/_test.html files."""
+  def get_test_files(self):
     test_files = []
     for root, _, files in os.walk("src/"):
       for f in fnmatch.filter(files, "*_test.html"):
         test_files.append(os.path.join(root, f))
+    return test_files
+
+  def generate_all_tests_file(self):
+    if os.path.exists(ALL_JSTESTS_FILE):
+      return
+    with open(ALL_JSTESTS_FILE, 'wb') as f:
+      f.write('var _allTests=')
+      f.write(repr(self.get_test_files()))
+      f.write(';')
+
+  def list_directory(self, path):
+    """Lists only src/**/_test.html files."""
+    test_files = self.get_test_files()
     out = StringIO.StringIO()
     out.write("<h2>End-To-End test server</h2>")
+    out.write('<h3>Test suite</h3>')
+    out.write('<a href=\"%s\">%s</a>\n' % ('/all_tests.html', 'all_tests.html'))
+    out.write('<h3>Individual tests</h3>')
     out.write("<ul>")
     for f in test_files:
       out.write("<li><a href=\"%s\">%s</a>\n" % (f, cgi.escape(f)))
@@ -58,6 +74,9 @@ class TestServerRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """Serves files from different directories."""
     if path.endswith("test_js_deps-runfiles.js"):
       return DEPS_FILE
+    if path == '/' + ALL_JSTESTS_FILE:
+      self.generate_all_tests_file()
+      return ALL_JSTESTS_FILE
     for prefix, dest_dir in TestServerRequestHandler.DIRECTORY_MAP.items():
       if path.startswith(prefix):
         return dest_dir + path[len(prefix):]

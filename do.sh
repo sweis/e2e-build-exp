@@ -157,8 +157,9 @@ e2e_testserver() {
     --root_with_prefix="src/javascript/crypto/e2e/ ../crypto/e2e/" \
     --root_with_prefix="lib/closure-templates/javascript/ ../../../../lib/closure-templates/javascript" \
     --root_with_prefix="lib/zlib.js/ ../../../lib/zlib.js/" \
-    > build/test_js_deps-runfiles.js
+    > "$BUILD_DIR/test_js_deps-runfiles.js"
 
+  rm "$BUILD_DIR/all_tests.js"
   echo "Starting the End-To-End test server (Press Ctrl-C to stop)..."
   $PYTHON_CMD test_server.py
   echo "Done."
